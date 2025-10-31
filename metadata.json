@@ -1,0 +1,5 @@
+{
+  "name": "AI News Feed",
+  "description": "A visually stunning news aggregator powered by the Gemini API to fetch and display the latest global news articles. The application features a modern, responsive design with a dark theme and engaging UI elements.",
+  "requestFramePermissions": []
+}
