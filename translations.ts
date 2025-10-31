@@ -7,6 +7,10 @@ const translations = {
     errorTitle: 'An Error Occurred',
     errorUnexpected: 'An unexpected error occurred.',
     footerText: 'Powered by Gemini',
+    searchPlaceholder: 'Search for news...',
+    searchButtonLabel: 'Search',
+    noArticlesFound: 'No Articles Found',
+    noArticlesFoundDescription: 'Try adjusting your search or category selection.',
     categories: {
       general: 'General',
       technology: 'Technology',
@@ -22,6 +26,10 @@ const translations = {
     errorTitle: 'حدث خطأ',
     errorUnexpected: 'An unexpected error occurred.',
     footerText: 'مدعوم بواسطة Gemini',
+    searchPlaceholder: 'ابحث عن أخبار...',
+    searchButtonLabel: 'بحث',
+    noArticlesFound: 'لم يتم العثور على مقالات',
+    noArticlesFoundDescription: 'جرّب تعديل بحثك أو اختيار فئة أخرى.',
     categories: {
       general: 'عام',
       technology: 'تكنولوجيا',

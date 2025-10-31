@@ -8,7 +8,7 @@ interface CategoryFilterProps {
 
 const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, selectedCategory, onSelectCategory }) => {
   return (
-    <div className="mb-8 flex items-center justify-center">
+    <div className="flex items-center justify-center">
       <div className="flex gap-2 sm:gap-3 overflow-x-auto p-2 -mx-2">
         {Object.entries(categories).map(([key, value]) => (
           <button

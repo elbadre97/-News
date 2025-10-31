@@ -30,18 +30,26 @@ const schema = {
 };
 
 
-export const fetchNews = async (language: Language, category: string): Promise<Article[]> => {
+export const fetchNews = async (language: Language, category: string, searchQuery: string): Promise<Article[]> => {
     const model = 'gemini-2.5-flash';
+    let prompt: string;
 
-    const promptForCategory = language === 'ar' 
-        ? `أحضر لي أحدث 12 مقالًا إخباريًا عالميًا بارزًا في تصنيف "${category}". يجب أن تكون المقالات حديثة وذات صلة ومترجمة إلى اللغة العربية.`
-        : `Fetch the 12 latest top global news articles in the "${category}" category. The articles should be recent and relevant.`;
-    
-    const promptForGeneral = language === 'ar' 
-        ? "أحضر لي أحدث 12 مقالًا إخباريًا عالميًا بارزًا في مجالات متنوعة مثل التكنولوجيا والسياسة والرياضة. يجب أن تكون المقالات حديثة وذات صلة ومترجمة إلى اللغة العربية."
-        : "Fetch the 12 latest top global news articles across various categories like technology, politics, and sports. The articles should be recent and relevant.";
+    if (searchQuery) {
+        prompt = language === 'ar' 
+            ? `أحضر لي أفضل 12 مقالًا إخباريًا عالميًا ذا صلة بكلمة البحث "${searchQuery}". يجب أن تكون المقالات حديثة وذات صلة ومترجمة إلى اللغة العربية.`
+            : `Fetch the 12 most relevant global news articles for the search query "${searchQuery}". The articles should be recent, relevant, and in English.`;
+    } else {
+        const promptForCategory = language === 'ar' 
+            ? `أحضر لي أحدث 12 مقالًا إخباريًا عالميًا بارزًا في تصنيف "${category}". يجب أن تكون المقالات حديثة وذات صلة ومترجمة إلى اللغة العربية.`
+            : `Fetch the 12 latest top global news articles in the "${category}" category. The articles should be recent, relevant, and in English.`;
+        
+        const promptForGeneral = language === 'ar' 
+            ? "أحضر لي أحدث 12 مقالًا إخباريًا عالميًا بارزًا في مجالات متنوعة مثل التكنولوجيا والسياسة والرياضة. يجب أن تكون المقالات حديثة وذات صلة ومترجمة إلى اللغة العربية."
+            : "Fetch the 12 latest top global news articles across various categories like technology, politics, and sports. The articles should be recent and relevant.";
 
-    const prompt = category === 'general' ? promptForGeneral : promptForCategory;
+        prompt = category === 'general' ? promptForGeneral : promptForCategory;
+    }
+
 
     try {
         const response = await ai.models.generateContent({
@@ -54,6 +62,10 @@ export const fetchNews = async (language: Language, category: string): Promise<A
         });
         
         const jsonText = response.text.trim();
+        // Handle cases where the API might return an empty string for no results
+        if (!jsonText) {
+            return [];
+        }
         const articles = JSON.parse(jsonText);
         
         if (!Array.isArray(articles)) {

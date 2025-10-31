@@ -5,9 +5,10 @@ import { Language } from '../App';
 interface NewsCardProps {
   article: Article;
   language: Language;
+  style?: React.CSSProperties;
 }
 
-const NewsCard: React.FC<NewsCardProps> = ({ article, language }) => {
+const NewsCard: React.FC<NewsCardProps> = ({ article, language, style }) => {
   const formatDate = (dateString: string) => {
     try {
       const locale = language === 'ar' ? 'ar-EG' : 'en-US';
@@ -26,7 +27,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, language }) => {
       href={article.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col bg-white dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl dark:hover:shadow-purple-500/20 transition-all duration-300 ease-in-out transform hover:-translate-y-2"
+      className="group flex flex-col bg-white dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md hover:shadow-xl dark:hover:shadow-purple-500/20 transition-all duration-300 ease-in-out transform hover:-translate-y-2 animate-fade-in"
+      style={style}
     >
       <div className="relative overflow-hidden">
         <img
@@ -46,7 +48,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, language }) => {
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-300 mb-2 flex-grow">
           {article.title}
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">
           {article.description}
         </p>
         <div className="mt-auto flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">

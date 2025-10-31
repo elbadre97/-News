@@ -6,8 +6,9 @@ import NewsCard from './components/NewsCard';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorMessage from './components/ErrorMessage';
 import Footer from './components/Footer';
-import { getTranslations } from './translations';
 import CategoryFilter from './components/CategoryFilter';
+import NoArticlesMessage from './components/NoArticlesMessage';
+import { getTranslations } from './translations';
 
 type Theme = 'light' | 'dark';
 export type Language = 'ar' | 'en';
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('general');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -70,7 +72,7 @@ const App: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const newsArticles = await fetchNews(language, selectedCategory);
+        const newsArticles = await fetchNews(language, selectedCategory, searchQuery);
         setArticles(newsArticles);
       } catch (err) {
         if (err instanceof Error) {
@@ -84,7 +86,19 @@ const App: React.FC = () => {
     };
 
     loadNews();
-  }, [language, selectedCategory, t.errorUnexpected]);
+  }, [language, selectedCategory, searchQuery, t.errorUnexpected]);
+  
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (query) {
+      setSelectedCategory('general');
+    }
+  };
+
+  const handleSelectCategory = (category: string) => {
+    setSelectedCategory(category);
+    setSearchQuery('');
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -94,11 +108,20 @@ const App: React.FC = () => {
     if (error) {
       return <ErrorMessage message={error} translations={t} />;
     }
+    
+    if (articles.length === 0) {
+      return <NoArticlesMessage translations={t} />;
+    }
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {articles.map((article, index) => (
-          <NewsCard key={article.url + index} article={article} language={language} />
+          <NewsCard 
+            key={article.url + index} 
+            article={article} 
+            language={language} 
+            style={{ animationDelay: `${index * 50}ms` }}
+          />
         ))}
       </div>
     );
@@ -116,15 +139,21 @@ const App: React.FC = () => {
         language={language}
         toggleLanguage={toggleLanguage}
         translations={t}
+        searchQuery={searchQuery}
+        onSearch={handleSearch}
       />
       
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <CategoryFilter
-          categories={t.categories}
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
-        />
-        {renderContent()}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="sticky top-0 z-10 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm py-4 mb-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-gray-200 dark:border-gray-800">
+           <CategoryFilter
+            categories={t.categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleSelectCategory}
+          />
+        </div>
+        <div className="pb-12">
+            {renderContent()}
+        </div>
       </main>
 
       <Footer translations={t} />
