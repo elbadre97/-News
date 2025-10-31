@@ -8,10 +8,13 @@ import ErrorMessage from './components/ErrorMessage';
 import Footer from './components/Footer';
 import CategoryFilter from './components/CategoryFilter';
 import NoArticlesMessage from './components/NoArticlesMessage';
+import AboutPage from './components/AboutPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import { getTranslations } from './translations';
 
 type Theme = 'light' | 'dark';
 export type Language = 'ar' | 'en';
+export type Page = 'home' | 'about' | 'privacy';
 
 const App: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -19,6 +22,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('general');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<Page>('home');
 
   const [language, setLanguage] = useState<Language>(() => {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -68,6 +72,8 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
+    if (currentPage !== 'home') return;
+
     const loadNews = async () => {
       try {
         setIsLoading(true);
@@ -86,7 +92,7 @@ const App: React.FC = () => {
     };
 
     loadNews();
-  }, [language, selectedCategory, searchQuery, t.errorUnexpected]);
+  }, [language, selectedCategory, searchQuery, t.errorUnexpected, currentPage]);
   
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -99,8 +105,17 @@ const App: React.FC = () => {
     setSelectedCategory(category);
     setSearchQuery('');
   };
+  
+  const handleNavigate = (page: Page) => {
+    setCurrentPage(page);
+    if (page === 'home') {
+      // Reset search and category when navigating back to home
+      setSearchQuery('');
+      setSelectedCategory('general');
+    }
+  };
 
-  const renderContent = () => {
+  const renderHomePageContent = () => {
     if (isLoading) {
       return <LoadingSpinner translations={t} />;
     }
@@ -114,7 +129,7 @@ const App: React.FC = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 animate-fade-in">
         {articles.map((article, index) => (
           <NewsCard 
             key={article.url + index} 
@@ -126,6 +141,30 @@ const App: React.FC = () => {
       </div>
     );
   };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'about':
+        return <AboutPage translations={t} />;
+      case 'privacy':
+        return <PrivacyPolicyPage translations={t} />;
+      case 'home':
+      default:
+        return (
+          <>
+            <div className="sticky top-0 z-10 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm py-4 mb-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-gray-200 dark:border-gray-800">
+              <CategoryFilter
+                categories={t.categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={handleSelectCategory}
+              />
+            </div>
+            {renderHomePageContent()}
+          </>
+        );
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white selection:bg-purple-500 selection:text-white transition-colors duration-300">
@@ -141,18 +180,13 @@ const App: React.FC = () => {
         translations={t}
         searchQuery={searchQuery}
         onSearch={handleSearch}
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
       />
       
       <main className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="sticky top-0 z-10 bg-gray-100/80 dark:bg-gray-900/80 backdrop-blur-sm py-4 mb-8 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 border-b border-gray-200 dark:border-gray-800">
-           <CategoryFilter
-            categories={t.categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleSelectCategory}
-          />
-        </div>
         <div className="pb-12">
-            {renderContent()}
+            {renderPage()}
         </div>
       </main>
 
