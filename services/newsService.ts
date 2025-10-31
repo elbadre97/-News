@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from '@google/genai';
-import { Article } from '../types';
+import { Article, BreakingNewsArticle } from '../types';
 import { Language } from "../App";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -86,5 +86,56 @@ export const fetchNews = async (language: Language, category: string, searchQuer
         }
 
         throw new Error(errorMessage);
+    }
+};
+
+const breakingNewsArticleSchema = {
+    type: Type.OBJECT,
+    properties: {
+        title: { type: Type.STRING, description: "The headline of the breaking news article." },
+        url: { type: Type.STRING, description: "The direct URL to the full article." },
+    },
+    required: ['title', 'url'],
+};
+
+const breakingNewsSchema = {
+    type: Type.ARRAY,
+    items: breakingNewsArticleSchema,
+    description: "A list of breaking news headlines."
+};
+
+export const fetchBreakingNews = async (language: Language): Promise<BreakingNewsArticle[]> => {
+    const model = 'gemini-2.5-flash';
+    const prompt = language === 'ar'
+        ? "أحضر لي آخر 5 عناوين أخبار عاجلة عالمية مهمة. يجب أن تكون المقالات حديثة للغاية (خلال الساعات القليلة الماضية) ومهمة جدًا ومترجمة إلى اللغة العربية."
+        : "Fetch the 5 latest top global breaking news headlines. The articles should be extremely recent (within the last few hours), very important, and in English.";
+
+    try {
+        const response = await ai.models.generateContent({
+            model: model,
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: breakingNewsSchema,
+            },
+        });
+        
+        const jsonText = response.text.trim();
+        if (!jsonText) {
+            return [];
+        }
+        const articles = JSON.parse(jsonText);
+        
+        if (!Array.isArray(articles)) {
+            console.error("Parsed breaking news response is not an array:", articles);
+            return []; // Return empty array on format error
+        }
+        
+        return articles;
+
+    } catch (error) {
+        console.error("Error fetching breaking news from Gemini API:", error);
+        // Don't throw an error for breaking news, just return empty so the main page can still load
+        return [];
     }
 };

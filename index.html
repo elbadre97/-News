@@ -25,6 +25,28 @@
         animation: fadeIn 0.5s ease-out forwards;
         opacity: 0;
       }
+      @keyframes scroll-ltr {
+        from { transform: translateX(0%); }
+        to { transform: translateX(-50%); }
+      }
+      @keyframes scroll-rtl {
+        from { transform: translateX(0%); }
+        to { transform: translateX(50%); }
+      }
+      .ticker-wrap .ticker-move {
+        animation-duration: 60s; /* Slower scroll for readability */
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+      }
+      [dir="ltr"] .ticker-wrap .ticker-move {
+        animation-name: scroll-ltr;
+      }
+      [dir="rtl"] .ticker-wrap .ticker-move {
+        animation-name: scroll-rtl;
+      }
+      .ticker-wrap:hover .ticker-move {
+        animation-play-state: paused;
+      }
     </style>
   <script type="importmap">
 {

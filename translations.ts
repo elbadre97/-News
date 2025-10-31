@@ -28,6 +28,7 @@ const translations = {
     privacyTitle: 'Privacy Policy',
     privacyContentP1: 'Your privacy is important to us. At News+, we do not collect any personal information from our users. The application is designed to be completely anonymous.',
     privacyContentP2: 'The news content is fetched dynamically from the Gemini API based on your selected categories or search queries. We do not store your preferences, search history, or any other data. All settings, such as theme and language, are stored locally on your device and are not transmitted to our servers.',
+    breakingNews: 'Breaking News',
   },
   ar: {
     headerSubtitle: 'جرعتك اليومية من العناوين العالمية',
@@ -56,6 +57,7 @@ const translations = {
     privacyTitle: 'سياسة الخصوصية',
     privacyContentP1: 'خصوصيتك مهمة بالنسبة لنا. في News+، لا نجمع أي معلومات شخصية من مستخدمينا. تم تصميم التطبيق ليكون مجهول الهوية تمامًا.',
     privacyContentP2: 'يتم جلب محتوى الأخبار ديناميكيًا من واجهة برمجة تطبيقات Gemini بناءً على الفئات التي تختارها أو استعلامات البحث. نحن لا نخزن تفضيلاتك أو سجل البحث أو أي بيانات أخرى. يتم تخزين جميع الإعدادات، مثل المظهر واللغة، محليًا على جهازك ولا يتم نقلها إلى خوادمنا.',
+    breakingNews: 'أخبار عاجلة',
   },
 };
 

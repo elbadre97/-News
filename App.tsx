@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Article } from './types';
-import { fetchNews } from './services/newsService';
+import { Article, BreakingNewsArticle } from './types';
+import { fetchNews, fetchBreakingNews } from './services/newsService';
 import Header from './components/Header';
 import NewsCard from './components/NewsCard';
 import LoadingSpinner from './components/LoadingSpinner';
@@ -10,6 +10,7 @@ import CategoryFilter from './components/CategoryFilter';
 import NoArticlesMessage from './components/NoArticlesMessage';
 import AboutPage from './components/AboutPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import BreakingNewsTicker from './components/BreakingNewsTicker';
 import { getTranslations } from './translations';
 
 type Theme = 'light' | 'dark';
@@ -18,6 +19,7 @@ export type Page = 'home' | 'about' | 'privacy';
 
 const App: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
+  const [breakingNews, setBreakingNews] = useState<BreakingNewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('general');
@@ -78,8 +80,12 @@ const App: React.FC = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const newsArticles = await fetchNews(language, selectedCategory, searchQuery);
+        const [newsArticles, breakingNewsArticles] = await Promise.all([
+          fetchNews(language, selectedCategory, searchQuery),
+          fetchBreakingNews(language)
+        ]);
         setArticles(newsArticles);
+        setBreakingNews(breakingNewsArticles);
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -159,6 +165,9 @@ const App: React.FC = () => {
                 onSelectCategory={handleSelectCategory}
               />
             </div>
+            {breakingNews.length > 0 && !isLoading && (
+              <BreakingNewsTicker articles={breakingNews} translations={t} />
+            )}
             {renderHomePageContent()}
           </>
         );

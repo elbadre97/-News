@@ -1,4 +1,3 @@
-
 export interface Article {
   title: string;
   description: string;
@@ -8,4 +7,9 @@ export interface Article {
   source: {
     name: string;
   };
+}
+
+export interface BreakingNewsArticle {
+  title: string;
+  url: string;
 }
